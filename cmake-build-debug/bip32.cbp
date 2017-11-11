@@ -88,7 +88,13 @@
 		<Unit filename="/Users/willskinner/CLionProjects/bip32/Bip32.h">
 			<Option target="bip32"/>
 		</Unit>
-		<Unit filename="/Users/willskinner/CLionProjects/bip32/main.cpp">
+		<Unit filename="/Users/willskinner/CLionProjects/bip32/Bip32Tests.cpp">
+			<Option target="bip32"/>
+		</Unit>
+		<Unit filename="/Users/willskinner/CLionProjects/bip32/utils.cpp">
+			<Option target="bip32"/>
+		</Unit>
+		<Unit filename="/Users/willskinner/CLionProjects/bip32/utils.h">
 			<Option target="bip32"/>
 		</Unit>
 		<Unit filename="/Users/willskinner/CLionProjects/bip32/CMakeLists.txt">
