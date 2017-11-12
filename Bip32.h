@@ -34,7 +34,7 @@ public:
 
     // point(p): returns the coordinate pair resulting from EC point multiplication (repeated application of the EC
     // group operation) of the secp256k1 base point with the integer p.
-    static CryptoPP::ECP::Point Point(const CryptoPP::Integer &p);
+    static CryptoPP::ECP::Point &Point(const CryptoPP::Integer &p);
 
     // ser32(i): serialize a 32-bit unsigned integer i as a 4-byte sequence, most significant byte first.
     static void ser32(byte destination[], uint32_t i);

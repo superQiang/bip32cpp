@@ -69,7 +69,8 @@ Bip32::ser32(byte destination[], uint32_t i) {
     destination[3] = static_cast<byte>((i & 0x000000ff));
 }
 
-ECP::Point
+ECP::Point &
 Bip32::Point(const Integer &p) {
-    return getCurve().Multiply(p, getParams().GetSubgroupGenerator());
+    const ECP::Point &mult = getCurve().Multiply(p, getParams().GetSubgroupGenerator());
+    return const_cast<ECP::Point &>(mult);
 }
