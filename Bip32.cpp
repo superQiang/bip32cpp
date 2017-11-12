@@ -4,18 +4,37 @@
 
 #include "Bip32.h"
 #include <cryptopp/ripemd.h>
-#include <cryptopp/oids.h>
+#include <assert.h>
 
 using namespace BIP32;
 using namespace CryptoPP;
 
-// Bitcoin uses SECP256K1 - object id 1.3.132.0.10
+// Statics
+CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP> *Bip32::params;
 
-Bip32::Bip32() {
-    const OID curveOid = ASN1::secp256k1();
-    this->params = (*new DL_GroupParameters_EC<ECP>(curveOid));
-    this->curve = params.GetCurve();
+CryptoPP::ECP *Bip32::curve;
+
+// Not thread safe
+DL_GroupParameters_EC<ECP> &Bip32::getParams() {
+    if (nullptr == Bip32::params) {
+        Bip32::params = new DL_GroupParameters_EC<ECP>(ASN1::secp256k1());
+    }
+
+    assert(nullptr != Bip32::params);
+    return *Bip32::params;
 }
+
+// Not thread safe
+ECP &Bip32::getCurve() {
+    if (nullptr == Bip32::params) {
+        Bip32::curve = const_cast<ECP *>(&getParams().GetCurve());
+    }
+
+    assert(nullptr != Bip32::curve);
+    return *Bip32::curve;
+}
+
+// end statics
 
 void
 Bip32::hash160(byte destination[], const byte *bytes, unsigned int datalen) {
@@ -26,14 +45,13 @@ Bip32::hash160(byte destination[], const byte *bytes, unsigned int datalen) {
 }
 
 void
-
 Bip32::ser256(byte destination[], const Integer &p) {
     p.Encode(destination, 256);
 }
 
 void
 Bip32::serP(byte destination[], const ECP::Point &point) {
-    curve.EncodePoint(destination, point, true);
+    getCurve().EncodePoint(destination, point, true);
 }
 
 Integer
@@ -51,16 +69,7 @@ Bip32::ser32(byte destination[], uint32_t i) {
     destination[3] = static_cast<byte>((i & 0x000000ff));
 }
 
-const ECP &Bip32::getCurve() const {
-    return curve;
-}
-
-const CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP> &Bip32::getParams() {
-    return params;
-}
-
 ECP::Point
 Bip32::Point(const Integer &p) {
-    return curve.Multiply(p, params.GetSubgroupGenerator());
+    return getCurve().Multiply(p, getParams().GetSubgroupGenerator());
 }
-

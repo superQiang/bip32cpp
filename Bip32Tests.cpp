@@ -29,18 +29,49 @@ TEST_CASE("Pretty printing bytes", "[bytes_to_hex_string]") {
 }
 
 TEST_CASE("Hash160", "[hash160]") {
-    auto *bip32 = new Bip32();
     string expected = "751e76e8199196d454941c45d1b3a323f1433bd6";
 
-    unsigned int size = bip32->getCurve().EncodedPointSize(true);
+    unsigned int size = Bip32::getCurve().EncodedPointSize(true);
     byte serBasePoint[size];
     fill_n(serBasePoint, size, 0);
-    bip32->serP(serBasePoint, bip32->getParams().GetSubgroupGenerator());
-    cout << bip32->getParams().GetSubgroupGenerator().x;
+    Bip32::serP(serBasePoint, Bip32::getParams().GetSubgroupGenerator());
 
     byte actual[RIPEMD160::DIGESTSIZE];
-    bip32->hash160(actual, serBasePoint, size);
+    Bip32::hash160(actual, serBasePoint, size);
     string actualString = bytes_to_hex_string(actual, RIPEMD160::DIGESTSIZE);
 
     REQUIRE(expected == actualString);
+}
+
+TEST_CASE("Integer serialization", "[ser32]") {
+    unsigned int i = 1 << 31;
+    byte expected[4] = {0x80, 0x0, 0x0, 0x0};
+    byte actual[4];
+    Bip32::ser32(actual, i);
+
+    for (int i = 0; i < 4; i++) {
+        REQUIRE(expected[i] == actual[i]);
+    }
+
+    i = 0;
+    byte expected2[4] = {0x0, 0x0, 0x0, 0x0};
+    byte actual2[4];
+    Bip32::ser32(actual2, i);
+
+    for (int i = 0; i < 4; i++) {
+        REQUIRE(expected2[i] == actual2[i]);
+    }
+
+    i = 0xffffffff;
+    byte expected3[4] = {0xff, 0xff, 0xff, 0xff};
+    byte actual3[4];
+    Bip32::ser32(actual3, i);
+
+    for (int i = 0; i < 4; i++) {
+        REQUIRE(expected3[i] == actual3[i]);
+    }
+}
+
+TEST_CASE("Parse private master key", "parseBase58Check") {
+    string priv = "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi";
 }
