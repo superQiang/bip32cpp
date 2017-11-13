@@ -13,12 +13,12 @@ public:
     class Builder {
     public:
         CryptoPP::Integer *privKey;
-        byte chainCode[];
+        byte chainCode[16];
         bool isMainnet;
         byte depth;
         ExtendedKeyPair *parent;
         unsigned int childNumber;
-        byte fingerprint[];
+        byte fingerprint[4];
         CryptoPP::ECP::Point *pubKey;
 
     public:
@@ -46,7 +46,7 @@ public:
 private:
     CryptoPP::Integer privKey;
     CryptoPP::ECP::Point pubKey;
-    byte chainCode[];
+    byte *chainCode;
     byte depth;
     ExtendedKeyPair *parent;
     unsigned int childNumber;
@@ -79,11 +79,11 @@ public:
 
     std::string serializePriv() const;
 
-    static ExtendedKeyPair parseBase58Check(std::string base58Encoded) const;
+    static ExtendedKeyPair parseBase58Check(std::string base58Encoded);
 
 
 private:
-    ExtendedKeyPair generateSubtree(std::vector<std::string> pathParts, unsigned int index = 1) const;
+    ExtendedKeyPair generateSubtree(std::vector<std::string> pathParts, unsigned int index) const;
 
     unsigned int parseIndex(std::string indexString) const;
 

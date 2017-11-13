@@ -29,39 +29,39 @@ optional <ExtendedKeyPair> ExtendedKeyPair::generate(std::string keyString) {
 
 ExtendedKeyPair ExtendedKeyPair::generateSubtree(std::vector<std::string> pathParts, unsigned int index = 1) const {
     if (pathParts.size() - index == 1) {
-        return this;
+        return *this;
     }
 
-    unsigned int index = parseIndex(pathParts[index]);
-    ExtendedKeyPair nextSubtree = ckdPriv(index);
-    return nextSubtree.generateSubtree(pathParts, index + 1);
+    unsigned int keyIndex = parseIndex(pathParts[index]);
+    ExtendedKeyPair nextSubtree = ckdPriv(keyIndex);
+    return nextSubtree.generateSubtree(pathParts, keyIndex + 1);
 }
 
-Builder ExtendedKeyPair::Builder::setPrivKey(const CryptoPP::Integer &privKey) {
+ExtendedKeyPair::Builder ExtendedKeyPair::Builder::setPrivKey(const CryptoPP::Integer &privKey) {
     this->privKey = const_cast<CryptoPP::Integer *>(&privKey);
     return *this;
 }
-
+ExtendedKeyPair::
 Builder ExtendedKeyPair::Builder::setIsMainnet(bool isMainnet) {
     this->isMainnet = isMainnet;
     return *this;
 }
-
+ExtendedKeyPair::
 Builder ExtendedKeyPair::Builder::setDepth(byte depth) {
     this->depth = depth;
     return *this;
 }
-
+ExtendedKeyPair::
 Builder ExtendedKeyPair::Builder::setParent(const ExtendedKeyPair &parent) {
     this->parent = const_cast<ExtendedKeyPair *> (&parent);
     return *this;
 }
-
+ExtendedKeyPair::
 Builder ExtendedKeyPair::Builder::setChildNumber(unsigned int childNumber) {
     this->childNumber = childNumber;
     return *this;
 }
-
+ExtendedKeyPair::
 Builder ExtendedKeyPair::Builder::setPubKey(const CryptoPP::ECP::Point &pubKey) {
     this->pubKey = const_cast<ECP::Point *> (&pubKey);
     return *this;
@@ -82,9 +82,15 @@ ExtendedKeyPair ExtendedKeyPair::Builder::build() {
 
         byte pubKeyHash[RIPEMD160::DIGESTSIZE];
         Bip32::hash160(pubKeyHash, serPub, 33);
-        fingerprint = {pubKeyHash[0], pubKeyHash[1], pubKeyHash[2], pubKeyHash[3]};
+        fingerprint[0] = pubKeyHash[0];
+        fingerprint[1] = pubKeyHash[1];
+        fingerprint[2] = pubKeyHash[2];
+        fingerprint[3] = pubKeyHash[3];
     } else {
-        fingerprint = new byte[]{0, 0, 0, 0};
+        fingerprint[0] = 0;
+        fingerprint[1] = 0;
+        fingerprint[2] = 0;
+        fingerprint[3] = 0;
     }
 
     return *new ExtendedKeyPair(this);
