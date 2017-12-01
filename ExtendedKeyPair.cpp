@@ -12,29 +12,29 @@ using namespace CryptoPP;
 using namespace BIP32;
 using namespace std;
 
-optional <ExtendedKeyPair> ExtendedKeyPair::generate(std::string keyString) {
+ExtendedKeyPair *ExtendedKeyPair::generate(std::string keyString) const {
     if (depth != 0) {
-        return nullopt;
+        throw "Only the root can generate extended keypairs";
     }
 
     vector<string> parts = split(keyString, '/');
-    assert(parts[0] == 'm');
+    assert(parts[0] == "m");
 
     if (parts.size() == 1) {
-        return optional < ExtendedKeyPair > {this};
+        return const_cast<ExtendedKeyPair*> (this);
     }
 
-    return optional<ExtendedKeyPair>(generateSubtree(parts), 1);
+    return generateSubtree(parts, 1);
 }
 
-ExtendedKeyPair ExtendedKeyPair::generateSubtree(std::vector<std::string> pathParts, unsigned int index = 1) const {
+ExtendedKeyPair *ExtendedKeyPair::generateSubtree(std::vector<std::string> pathParts, unsigned int index = 1) const {
     if (pathParts.size() - index == 1) {
-        return *this;
+        return const_cast<ExtendedKeyPair*>(this);
     }
 
     unsigned int keyIndex = parseIndex(pathParts[index]);
-    ExtendedKeyPair nextSubtree = ckdPriv(keyIndex);
-    return nextSubtree.generateSubtree(pathParts, keyIndex + 1);
+    ExtendedKeyPair *nextSubtree = ckdPriv(keyIndex);
+    return nextSubtree->generateSubtree(pathParts, keyIndex + 1);
 }
 
 ExtendedKeyPair::Builder ExtendedKeyPair::Builder::setPrivKey(const CryptoPP::Integer &privKey) {
@@ -106,7 +106,7 @@ ExtendedKeyPair::ExtendedKeyPair(ExtendedKeyPair::Builder *builder) {
     this->isMainnet = builder->isMainnet;
 }
 
-vector<string> ExtendedKeyPair::split(string &str, char delimiter) {
+vector<string> ExtendedKeyPair::split(string &str, char delimiter) const {
     vector<string> parts;
     stringstream ss(str);
     string item;
@@ -127,5 +127,25 @@ unsigned int ExtendedKeyPair::parseIndex(std::string indexString) const {
     }
 
     return value;
+}
+
+ExtendedKeyPair *ExtendedKeyPair::ckdPriv(unsigned int i) const {
+    return nullptr;
+}
+
+ExtendedKeyPair *ExtendedKeyPair::neuter() const {
+    return nullptr;
+}
+
+std::string ExtendedKeyPair::serializePub() const {
+    return std::__cxx11::string();
+}
+
+std::string ExtendedKeyPair::serializePriv() const {
+    return std::__cxx11::string();
+}
+
+ExtendedKeyPair *ExtendedKeyPair::parseBase58Check(std::string base58Encoded) {
+    return nullptr;
 }
 

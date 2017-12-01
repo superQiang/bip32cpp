@@ -69,25 +69,25 @@ public:
      *
      * @param keyString A string like /iH/0/k
      */
-    std::optional<ExtendedKeyPair> generate(std::string keyString) const;
+    ExtendedKeyPair *generate(std::string keyString) const;
 
-    ExtendedKeyPair ckdPriv(unsigned int i) const;
+    ExtendedKeyPair *ckdPriv(unsigned int i) const;
 
-    ExtendedKeyPair neuter() const;
+    ExtendedKeyPair *neuter() const;
 
     std::string serializePub() const;
 
     std::string serializePriv() const;
 
-    static ExtendedKeyPair parseBase58Check(std::string base58Encoded);
+    static ExtendedKeyPair *parseBase58Check(std::string base58Encoded);
 
 
 private:
-    ExtendedKeyPair generateSubtree(std::vector<std::string> pathParts, unsigned int index) const;
+    ExtendedKeyPair *generateSubtree(std::vector<std::string> pathParts, unsigned int index) const;
 
     unsigned int parseIndex(std::string indexString) const;
 
-    std::vector<std::string> split(std::string &str, char delimiter);
+    std::vector<std::string> split(std::string &str, char delimiter) const;
 };
 
 
